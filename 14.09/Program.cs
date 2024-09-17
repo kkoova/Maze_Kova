@@ -11,6 +11,7 @@ class Maze
         int height = 10;
 
         int[,] maze = GenerateMaze(width, height);
+        GenerateDopPath(maze);
         KeyboardHandler handler = new KeyboardHandler(maze, height, width);
 
         while (!handler.IsGameEnded)
@@ -23,7 +24,6 @@ class Maze
             PrintMazeWithSolution(maze);
         }
     }
-
     public static int[,] GenerateMaze(int width, int height)
     {
         int[,] maze = new int[width, height];
@@ -31,87 +31,56 @@ class Maze
 
         for (int x = 0; x < width; x++)
         {
-            maze[x, 0] = 1; 
-            maze[x, height - 1] = 1;
-        }
-        for (int y = 0; y < height; y++)
-        {
-            maze[0, y] = 1;
-            maze[width - 1, y] = 1;
+            for (int y = 0; y < height; y++)
+            {
+                maze[x, y] = 1;
+            }
         }
 
         int StartMaze;
         StartMaze = rand.Next(0, height - 1);
-        maze[0, StartMaze] = 0;
+        maze[0, StartMaze] = 2;
 
         int currentX = 1;
         int currentY = StartMaze;
+        maze[currentX, currentY] = 2;
+
         while (currentX < width - 1)
         {
-            int[] numbers = { 1, 2, 3, 4, 5};
+            int[] numbers = { 1, 2, 3, 4 };
             int randomIndex = rand.Next(numbers.Length);
 
             switch (randomIndex)
             {
                 case 1:
                     if (currentY > 1)
-                        currentY--;
-                    maze[currentX, currentY] = 2;
-                    if (currentY > 1)
-                        currentY--;
+                        if (maze[currentX, currentY - 1] != 2)
+                            currentY--;
                     break;
                 case 2:
                     if (currentY < height - 2)
-                        currentY++;
-                    maze[currentX, currentY] = 2;
-                    if (currentX < width - 1)
-                        currentX++;
+                        if (maze[currentX, currentY + 1] != 2)
+                            currentY++;
                     break;
                 case 3:
-                    if (currentX < width - 1)
-                        currentX++;
-                    maze[currentX, currentY] = 2;
                     if (currentX < width - 1)
                         currentX++;
                     break;
                 case 4:
                     if (currentX > 1)
-                        currentX--;
-                    break;
-                case 5:
-                    if (currentY < height - 2)
-                        currentY++;
-                    maze[currentX, currentY] = 2;
-                    if (currentX > 1)
-                        currentX--;
+                        if (maze[currentX - 1, currentY] != 2)
+                            currentX--;
                     break;
             }
             maze[currentX, currentY] = 2;
-            //GenerateWalls();
-            //currentX++;
-
-            //Выход из лабиринта
-            //maze[currentX, currentY] = 0;
-
-            void GenerateWalls()
-            {
-                // Создаем стену сверху
-                if (currentY > 0 && maze[currentX, currentY - 1] != 3)
-                    maze[currentX, currentY - 1] = 1;
-                if (rand.NextDouble() < 0.5 && currentY > 1)
-                {
-                    //GenerateMazeDop(currentX, currentY - 1, maze);
-                }
-
-                // Создаем стену снизу
-                if (currentY < height - 1 && maze[currentX, currentY + 1] != 3)
-                    maze[currentX, currentY + 1] = 1;
-            }
         }
         return maze;
     }
+    public static int[,] GenerateDopPath(int[,] maze)
+    {
 
-    
+        return maze;
+    }
     private static void PrintMazeWithSolution(int[,] maze)
     {
         Console.Clear();
@@ -131,7 +100,7 @@ class Maze
                         break;
                     case 2: 
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write("*");
+                        Console.Write(" ");
                         break;
                     case 3: // Стена
                         Console.ForegroundColor = ConsoleColor.White;
