@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
 
 class Maze
 {
@@ -9,9 +11,17 @@ class Maze
         int height = 20;
 
         int[,] maze = GenerateMaze(width, height);
+        KeyboardHandler handler = new KeyboardHandler(maze, height, width);
 
-        PrintMazeWithSolution(maze);
+        while (!handler.IsGameEnded)
+        {
+            PrintMazeWithSolution(maze);
 
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            handler.HandleKeyPress(info.Key);
+
+            PrintMazeWithSolution(maze);
+        }
     }
 
     public static int[,] GenerateMaze(int width, int height)
@@ -19,24 +29,21 @@ class Maze
         int[,] maze = new int[width, height];
         Random rand = new Random();
 
-        // Создание границы вокруг всего лабиринта
         for (int x = 0; x < width; x++)
         {
-            maze[x, 0] = 1; // Верхняя граница
-            maze[x, height - 1] = 1; // Нижняя граница
+            maze[x, 0] = 1; 
+            maze[x, height - 1] = 1;
         }
         for (int y = 0; y < height; y++)
         {
-            maze[0, y] = 1; // Левая граница
-            maze[width - 1, y] = 1; // Правая граница
+            maze[0, y] = 1;
+            maze[width - 1, y] = 1;
         }
 
-        // Случайный выбор начала лабиринта
         int StartMaze;
         StartMaze = rand.Next(0, height - 1);
         maze[0, StartMaze] = 0;
 
-        // Генерация пути
         int currentX = 1;
         int currentY = StartMaze;
         while (currentX < width - 1)
@@ -91,6 +98,7 @@ class Maze
 
     private static void PrintMazeWithSolution(int[,] maze)
     {
+        Console.Clear();
         for (int y = 0; y < maze.GetLength(1); y++)
         {
             for (int x = 0; x < maze.GetLength(0); x++)
@@ -105,14 +113,20 @@ class Maze
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("█");
                         break;
+                    case 2: 
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write("*");
+                        break;
                     case 3: // Стена
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("▒");
                         break;
+
                 }
             }
             Console.WriteLine();
         }
+        Console.WriteLine("\nНажмите 'E' для подсказки\nНажмите 'X' для выхода из программы");
         Console.ResetColor();
     }
 }
