@@ -8,10 +8,9 @@ class Maze
     public static void Main(string[] args)
     {
         int width = 40;
-        int height = 20;
+        int height = 10;
 
         int[,] maze = GenerateMaze(width, height);
-        GenerateMazeDop(width, height, maze);
         KeyboardHandler handler = new KeyboardHandler(maze, height, width);
 
         while (!handler.IsGameEnded)
@@ -49,100 +48,70 @@ class Maze
         int currentY = StartMaze;
         while (currentX < width - 1)
         {
-            GenerateWalls();
-            maze[currentX, currentY] = 3; // Отмечаем текущую ячейку как часть пути
+            int[] numbers = { 1, 2, 3, 4, 5};
+            int randomIndex = rand.Next(numbers.Length);
 
-            // Двигаемся вправо
-            currentX++;
-            GenerateWalls();
-            maze[currentX, currentY] = 3;
+            switch (randomIndex)
+            {
+                case 1:
+                    if (currentY > 1)
+                        currentY--;
+                    maze[currentX, currentY] = 2;
+                    if (currentY > 1)
+                        currentY--;
+                    break;
+                case 2:
+                    if (currentY < height - 2)
+                        currentY++;
+                    maze[currentX, currentY] = 2;
+                    if (currentX < width - 1)
+                        currentX++;
+                    break;
+                case 3:
+                    if (currentX < width - 1)
+                        currentX++;
+                    maze[currentX, currentY] = 2;
+                    if (currentX < width - 1)
+                        currentX++;
+                    break;
+                case 4:
+                    if (currentX > 1)
+                        currentX--;
+                    break;
+                case 5:
+                    if (currentY < height - 2)
+                        currentY++;
+                    maze[currentX, currentY] = 2;
+                    if (currentX > 1)
+                        currentX--;
+                    break;
+            }
+            maze[currentX, currentY] = 2;
+            //GenerateWalls();
+            //currentX++;
 
-            // Случайно поднимаемся или опускаемся на одну ячейку
-            if (rand.NextDouble() < 0.5 && currentY > 1)
+            //Выход из лабиринта
+            //maze[currentX, currentY] = 0;
+
+            void GenerateWalls()
             {
-                currentY--;
-                maze[currentX, currentY] = 3;
-                GenerateWalls();
-                currentX++;
-            }
-            else if (rand.NextDouble() > 0.5 && currentY < height - 2)
-            {
-                currentY++;
-                maze[currentX, currentY] = 3;
-                GenerateWalls();
-                currentX++;
-            }
-            else if (rand.NextDouble() < 0.9 && currentX < width - 1)
-            {
-                maze[currentX, currentY] = 3;
-                currentX++;
+                // Создаем стену сверху
+                if (currentY > 0 && maze[currentX, currentY - 1] != 3)
+                    maze[currentX, currentY - 1] = 1;
+                if (rand.NextDouble() < 0.5 && currentY > 1)
+                {
+                    //GenerateMazeDop(currentX, currentY - 1, maze);
+                }
+
+                // Создаем стену снизу
+                if (currentY < height - 1 && maze[currentX, currentY + 1] != 3)
+                    maze[currentX, currentY + 1] = 1;
             }
         }
-
-        //Выход из лабиринта
-        maze[currentX, currentY] = 0;
-
         return maze;
-
-        void GenerateWalls()
-        {
-            // Создаем стену сверху
-            if (currentY > 0 && maze[currentX, currentY - 1] != 3)
-                maze[currentX, currentY - 1] = 1;
-
-            // Создаем стену снизу
-            if (currentY < height - 1 && maze[currentX, currentY + 1] != 3)
-                maze[currentX, currentY + 1] = 1;
-        }
     }
 
-    public static int[,] GenerateMazeDop(int width, int height, int[,] maze)
-    {
-        int currentX = 1;
-        int currentY = 1;
-        Random rand = new Random();
-
-        while (currentX < width - 1)
-        {
-            maze[currentX, currentY] = 2; // Отмечаем текущую ячейку как часть пути
-            GenerateWalls();
-
-            // Случайно поднимаемся или опускаемся на одну ячейку
-            if (rand.NextDouble() < 0.5 && currentY > 1)
-            {
-                currentY--;
-                maze[currentX, currentY] = 2;
-                GenerateWalls();
-                currentX++;
-            }
-            else if (rand.NextDouble() > 0.5 && currentY < height - 2)
-            {
-                currentY++;
-                maze[currentX, currentY] = 2;
-                GenerateWalls();
-                currentX++;
-            }
-            else if (rand.NextDouble() < 0.2 && currentX < width - 1)
-            {
-                maze[currentX, currentY] = 2;
-                GenerateWalls();
-                currentX++;
-            }
-        }
-
-        return maze;
-
-        void GenerateWalls()
-        {
-            // Создаем стену сверху
-            if (currentY > 0 && maze[currentX, currentY - 1] != 3)
-                maze[currentX, currentY - 1] = 1;
-
-            // Создаем стену снизу
-            if (currentY < height - 1 && maze[currentX, currentY + 1] != 3)
-                maze[currentX, currentY + 1] = 1;
-        }
-    }
+    
     private static void PrintMazeWithSolution(int[,] maze)
     {
         Console.Clear();
