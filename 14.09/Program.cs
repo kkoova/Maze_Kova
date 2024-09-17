@@ -11,6 +11,7 @@ class Maze
         int height = 20;
 
         int[,] maze = GenerateMaze(width, height);
+        GenerateMazeDop(width, height, maze);
         KeyboardHandler handler = new KeyboardHandler(maze, height, width);
 
         while (!handler.IsGameEnded)
@@ -95,7 +96,53 @@ class Maze
         }
     }
 
+    public static int[,] GenerateMazeDop(int width, int height, int[,] maze)
+    {
+        int currentX = 1;
+        int currentY = 1;
+        Random rand = new Random();
 
+        while (currentX < width - 1)
+        {
+            maze[currentX, currentY] = 2; // Отмечаем текущую ячейку как часть пути
+            GenerateWalls();
+
+            // Случайно поднимаемся или опускаемся на одну ячейку
+            if (rand.NextDouble() < 0.5 && currentY > 1)
+            {
+                currentY--;
+                maze[currentX, currentY] = 2;
+                GenerateWalls();
+                currentX++;
+            }
+            else if (rand.NextDouble() > 0.5 && currentY < height - 2)
+            {
+                currentY++;
+                maze[currentX, currentY] = 2;
+                GenerateWalls();
+                currentX++;
+            }
+            else if (rand.NextDouble() < 0.2 && currentX < width - 1)
+            {
+                maze[currentX, currentY] = 2;
+                GenerateWalls();
+                currentX++;
+            }
+        }
+
+        return maze;
+
+        void GenerateWalls()
+        {
+            // Создаем стену сверху
+            if (currentY > 0 && maze[currentX, currentY - 1] != 3)
+                maze[currentX, currentY - 1] = 1;
+
+            // Создаем стену снизу
+            if (currentY < height - 1 && maze[currentX, currentY + 1] != 3)
+                maze[currentX, currentY + 1] = 1;
+        }
+    }
     private static void PrintMazeWithSolution(int[,] maze)
     {
         Console.Clear();
