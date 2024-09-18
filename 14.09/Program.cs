@@ -50,35 +50,56 @@ class Maze
             int[] numbers = { 1, 2, 3, 4 };
             int randomIndex = rand.Next(numbers.Length);
 
-            switch (randomIndex)
-            {
-                case 1:
-                    if (currentY > 1)
-                        if (maze[currentX, currentY - 1] != 2)
-                            currentY--;
-                    break;
-                case 2:
-                    if (currentY < height - 2)
-                        if (maze[currentX, currentY + 1] != 2)
-                            currentY++;
-                    break;
-                case 3:
-                    if (currentX < width - 1)
-                        currentX++;
-                    break;
-                case 4:
-                    if (currentX > 1)
-                        if (maze[currentX - 1, currentY] != 2)
-                            currentX--;
-                    break;
-            }
-            maze[currentX, currentY] = 2;
+            GeneratePath(maze, randomIndex, currentX, currentY);
         }
+        return maze;
+    }
+
+    public static int[,] GeneratePath(int[,] maze, int randomIndex, int currentX,
+        int currentY)
+    {
+        switch (randomIndex)
+        {
+            case 1:
+                if (currentY > 1)
+                    //if (maze[currentX, currentY - 1] != 2)
+                        currentY--;
+                break;
+            case 2:
+                if (currentY < maze.GetLength(1) - 2)
+                    //if (maze[currentX, currentY + 1] != 2)
+                        currentY++;
+                break;
+            case 3:
+                if (currentX < maze.GetLength(0) - 1)
+                    currentX++;
+                break;
+            case 4:
+                if (currentX > 1)
+                    if (maze[currentX - 1, currentY] != 2)
+                        currentX--;
+                break;
+        }
+        maze[currentX, currentY] = 2;
+
         return maze;
     }
     public static int[,] GenerateDopPath(int[,] maze)
     {
+        for (int y = 0; y < 10; y++)
+        {
+            Random rand = new Random();
+            int[] numbers = { 1, 2, 3, 4 };
+            int randomIndex = rand.Next(numbers.Length);
 
+            int xx = rand.Next(1, maze.GetLength(0));
+            int yy = rand.Next(1, maze.GetLength(1));
+
+            if (maze[xx, yy] == 2)
+             {
+                GeneratePath(maze, randomIndex, xx, yy);
+             }
+        }
         return maze;
     }
     private static void PrintMazeWithSolution(int[,] maze)
