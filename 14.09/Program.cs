@@ -7,10 +7,11 @@ class Maze
 {
     public static void Main(string[] args)
     {
-        int width = 40;
+        int width = 50;
         int height = 10;
 
         int[,] maze = GenerateMaze(width, height);
+        GenNewMaz(maze);
 
         KeyboardHandler handler = new KeyboardHandler(maze, height, width);
 
@@ -63,7 +64,7 @@ class Maze
                     break;
                 case 3:
                     if (currentX < maze.GetLength(0) - 1)
-                        currentX++;
+                            currentX++;
                     break;
                 case 4:
                     if (currentX > 1)
@@ -75,6 +76,45 @@ class Maze
         }
         return maze;
     }
+
+    private static int [,] GenNewMaz(int[,] maze)
+    {
+        Random rand = new Random();
+        for (int i = 0; i < maze.GetLength(0) + maze.GetLength(1); i++)
+        {
+            int X = rand.Next(1, maze.GetLength(0) - 2);
+            int Y = rand.Next(1, maze.GetLength(1) - 2); 
+            
+            for (int j = 0; j <= rand.Next(15, maze.GetLength(0) + 5); j++)
+            {
+                switch (rand.Next(1, 4))
+                {
+                    case 1:
+                        if (Y > 1)
+                                Y--;
+                        break;
+                    case 2:
+                        if (Y < maze.GetLength(1) - 2)
+                                Y++;
+                        break;
+                    case 3:
+                        if (X < maze.GetLength(0) - 2)
+                            X++;
+                        break;
+                    case 4:
+                        if (X > 1)
+                                X--;
+                        break;
+                }
+                if (maze[X, Y] == 2)
+                    break;
+                else
+                    maze[X, Y] = 0;
+            }
+        }
+
+        return maze;
+    }
     private static void PrintMazeWithSolution(int[,] maze)
     {
         Console.Clear();
@@ -84,11 +124,11 @@ class Maze
             {
                 switch (maze[x, y])
                 {
-                    case 0: // Пустое пространство
+                    case 0: 
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write("▒");
+                        Console.Write(" ");
                         break;
-                    case 1: // Стена
+                    case 1: 
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("█");
                         break;
@@ -96,9 +136,9 @@ class Maze
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(" ");
                         break;
-                    case 3: // Стена
+                    case 3: 
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write("▒");
+                        Console.Write("∙");
                         break;
 
                 }
