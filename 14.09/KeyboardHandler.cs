@@ -6,7 +6,7 @@ public class KeyboardHandler
     int height;
     int width;
     private bool gameEnded = false;
-    private bool isModifiedPath = true;
+    private bool isModifiedPath = false;
 
     public bool IsGameEnded => gameEnded;
 
