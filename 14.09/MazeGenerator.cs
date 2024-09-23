@@ -4,13 +4,14 @@ using System.Collections.Generic;
 public class MazeGenerator
 {
     static int width = 41;
-    static int height = 21;
+    static int height = 11;
     static int[,] maze = new int[width, height];
 
     public static void Main()
     {
         GenerateMaze();
         PrintMaze();
+        KeyboardHandler.HandleKeyPress(ConsoleKey);
     }
 
     static void GenerateMaze()
@@ -62,6 +63,9 @@ public class MazeGenerator
 
     static void PrintMaze()
     {
+        maze[1, 1] = 2;
+        maze[maze.GetLength(0) - 2, maze.GetLength(1) - 2] = 3;
+
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -70,9 +74,17 @@ public class MazeGenerator
                 {
                     Console.Write("█");
                 }
-                else
+                else if (maze[x, y] == 0)
                 {
                     Console.Write(" ");
+                }
+                else if (maze[x, y] == 2)
+                {
+                    Console.Write("<");
+                }
+                else
+                {
+                    Console.Write(">");
                 }
             }
             Console.WriteLine();
