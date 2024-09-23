@@ -14,7 +14,7 @@ public class MazeGenerator
         while (width < 4 || height < 4)
         {
             Console.Write("Введите ширину: ");
-            string? widthInput = Console.ReadLine();
+            var widthInput = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(widthInput) || !int.TryParse(widthInput, out width) || width < 4)
             {
@@ -22,7 +22,7 @@ public class MazeGenerator
                 continue;
             }
             Console.Write("Введите высоту: ");
-            string? heightInput = Console.ReadLine();
+            var heightInput = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(heightInput) || !int.TryParse(heightInput, out height) || height < 4)
             {
@@ -53,16 +53,16 @@ public class MazeGenerator
 
     static void GenerateMaze()
     {
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
                 maze[x, y] = 1;
             }
         }
 
-        Random rand = new Random();
-        Stack<(int x, int y)> stack = new Stack<(int x, int y)>();
+        var rand = new Random();
+        var stack = new Stack<(int x, int y)>();
         int startX = 1, startY = 1;
         maze[startX, startY] = 0;
         stack.Push((startX, startY));
@@ -72,12 +72,12 @@ public class MazeGenerator
         while (stack.Count > 0)
         {
             var (currentX, currentY) = stack.Peek();
-            List<(int x, int y)> neighbors = new List<(int x, int y)>();
+            var neighbors = new List<(int x, int y)>();
 
             foreach (var (dx, dy) in directions)
             {
-                int nx = currentX + dx;
-                int ny = currentY + dy;
+                var nx = currentX + dx;
+                var ny = currentY + dy;
                 if (nx > 0 && nx < width - 1 && ny > 0 && ny < height - 1 && maze[nx, ny] == 1)
                 {
                     neighbors.Add((nx, ny));
