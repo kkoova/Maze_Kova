@@ -1,17 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
 
 public class MazeGenerator
 {
-    static int width = 41;
-    static int height = 11;
-    static int[,] maze = new int[width, height];
+    static int width;
+    static int height;
+    static int[,] maze = new int[0, 0];
 
     public static void Main()
     {
+        while (width < 4 || height < 4)
+        {
+            Console.Write("Введите ширину: ");
+            string? widthInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(widthInput) || !int.TryParse(widthInput, out width) || width < 4)
+            {
+                Console.WriteLine("Ошибка: введите корректное число больше 4.");
+                continue;
+            }
+            Console.Write("Введите высоту: ");
+            string? heightInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(heightInput) || !int.TryParse(heightInput, out height) || height < 4)
+            {
+                Console.WriteLine("Ошибка: введите корректное число больше 4.");
+                continue;
+            }
+
+            Console.Clear();
+        }
+
+        if (width % 2 == 0)
+        { width += 1; }
+        if (height % 2 == 0)
+        { height += 1; }
+
+        maze = new int[width, height];
+
         GenerateMaze();
-        PrintMaze();
-        KeyboardHandler.HandleKeyPress(ConsoleKey);
+        KeyboardHandler handler = new KeyboardHandler(maze);
+
+        while (!handler.IsGameEnded)
+        {
+            PrintMaze();
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            handler.HandleKeyPress(info.Key);
+        }
     }
 
     static void GenerateMaze()
@@ -89,5 +126,6 @@ public class MazeGenerator
             }
             Console.WriteLine();
         }
+        Console.WriteLine("\nДля выхода - 'X'\nДля подсказки - 'E'\nУправление:\n\n   W\nA  S  D");
     }
 }

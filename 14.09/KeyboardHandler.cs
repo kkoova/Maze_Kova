@@ -3,18 +3,14 @@
 public class KeyboardHandler
 {
     private int[,] maze;
-    int height;
-    int width;
     private bool gameEnded = false;
     private bool isModifiedPath = false;
 
     public bool IsGameEnded => gameEnded;
 
-    public KeyboardHandler(int[,] maze, int height, int wight)
+    public KeyboardHandler(int[,] maze)
     {
         this.maze = maze;
-        this.width = wight;
-        this.height = height;
     }
 
     public void HandleKeyPress(ConsoleKey key)
