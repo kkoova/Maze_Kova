@@ -11,6 +11,9 @@ public class MazeGenerator
 
     public static void Main()
     {
+        var playerSymbol = 'P';
+        int playerX = 1, playerY = 1;
+
         while (width < 4 || height < 4)
         {
             Console.Write("Введите ширину: ");
@@ -29,8 +32,6 @@ public class MazeGenerator
                 Console.WriteLine("Ошибка: введите корректное число больше 4.");
                 continue;
             }
-
-            Console.Clear();
         }
 
         if (width % 2 == 0)
@@ -40,14 +41,71 @@ public class MazeGenerator
 
         maze = new int[width, height];
 
+        Console.Clear();
         GenerateMaze();
-        KeyboardHandler handler = new KeyboardHandler(maze);
+        var handler = new KeyboardHandler(maze);
 
         while (!handler.IsGameEnded)
         {
             PrintMaze();
             ConsoleKeyInfo info = Console.ReadKey(true);
             handler.HandleKeyPress(info.Key);
+            DisplayMaze(width, height, playerX, playerY);
+            MovePlayer(info.Key, ref playerX, ref playerY, width, height);
+        }
+    }
+
+    static void DisplayMaze(int width, int height, int playerX, int playerY)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (x == playerX && y == playerY)
+                {
+                    Console.Write('P');
+                }
+                else
+                {
+                    Console.Write(' ');
+                }
+            }
+            Console.WriteLine();
+        }
+    }
+
+    static void MovePlayer(ConsoleKey key, ref int playerX, ref int playerY, int width, int height)
+    {
+        switch (key)
+        {
+            case ConsoleKey.UpArrow:
+                if (playerY > 0)
+                {
+                    playerY--;
+                }
+
+                break;
+            case ConsoleKey.DownArrow:
+                if (playerY < height - 1)
+                {
+                    playerY++;
+                }
+
+                break;
+            case ConsoleKey.LeftArrow:
+                if (playerX > 0)
+                {
+                    playerX--;
+                }
+
+                break;
+            case ConsoleKey.RightArrow:
+                if (playerX < width - 1)
+                {
+                    playerX++;
+                }
+
+                break;
         }
     }
 
