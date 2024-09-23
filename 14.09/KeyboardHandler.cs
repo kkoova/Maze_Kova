@@ -1,78 +1,91 @@
 ﻿using System.Numerics;
 
-public class KeyboardHandler
+namespace KorobeynikovaMaze
 {
-    private int[,] maze;
-    private bool gameEnded = false;
-    private bool isModifiedPath = false;
-
-    public bool IsGameEnded => gameEnded;
-
-    public KeyboardHandler(int[,] maze)
+    public class KeyboardHandler(int[,] maze)
     {
-        this.maze = maze;
-    }
+        private readonly int[,] maze = maze;
+        private bool gameEnded = false;
+        private bool isModifiedPath = false;
 
-    public void HandleKeyPress(ConsoleKey key)
-    {
-        if (gameEnded)
-        {
-            return;
-        }
+        public bool IsGameEnded => gameEnded;
 
-        switch (key)
+        public void HandleKeyPress(ConsoleKey key, ref int playerX, ref int playerY)
         {
-            case ConsoleKey.E:
-                ToggleModifiedPath();
-                break;
-            case ConsoleKey.X:
-                EndGame();
-                break;
-        }
-    }
-
-    private void ToggleModifiedPath()
-    {
-        if (isModifiedPath)
-        {
-            ResetToOriginalPath();
-        }
-        else
-        {
-            ApplyModifiedPath();
-        }
-        isModifiedPath = !isModifiedPath;
-    }
-
-    private void ApplyModifiedPath()
-    {
-        for (int x = 0; x < maze.GetLength(0); x++)
-        {
-            for (int y = 0; y < maze.GetLength(1); y++)
+            if (gameEnded)
             {
-                if (maze[x, y] == 2)
+                return;
+            }
+
+            switch (key)
+            {
+                case ConsoleKey.E:
+                    ToggleModifiedPath();
+                    break;
+                case ConsoleKey.X:
+                    EndGame();
+                    break;
+                case ConsoleKey.W:
+                    if (playerY > 0 && maze[playerX, playerY - 1] != 1)
+                    { playerY--; }
+                    break;
+                case ConsoleKey.S:
+                    if (playerY < maze.GetLength(1) - 1 && maze[playerX, playerY + 1] != 1)
+                    { playerY++; }
+                    break;
+                case ConsoleKey.A:
+                    if (playerX > 0 && maze[playerX - 1, playerY] != 1)
+                    { playerX--; }
+                    break;
+                case ConsoleKey.D:
+                    if (playerX < maze.GetLength(0) - 1 && maze[playerX + 1, playerY] != 1)
+                    { playerX++; }
+                    break;
+            }
+        }
+        private void ToggleModifiedPath()
+        {
+            if (isModifiedPath)
+            {
+                ResetToOriginalPath();
+            }
+            else
+            {
+                ApplyModifiedPath();
+            }
+            isModifiedPath = !isModifiedPath;
+        }
+
+        private void ApplyModifiedPath()
+        {
+            for (var x = 0; x < maze.GetLength(0); x++)
+            {
+                for (var y = 0; y < maze.GetLength(1); y++)
                 {
-                    maze[x, y] = 3;
+                    if (maze[x, y] == 2)
+                    {
+                        maze[x, y] = 3;
+                    }
                 }
             }
         }
-    }
 
-    private void ResetToOriginalPath()
-    {
-        for (int x = 0; x < maze.GetLength(0); x++)
+        private void ResetToOriginalPath()
         {
-            for (int y = 0; y < maze.GetLength(1); y++)
+            for (var x = 0; x < maze.GetLength(0); x++)
             {
-                if (maze[x, y] == 3)
+                for (var y = 0; y < maze.GetLength(1); y++)
                 {
-                    maze[x, y] = 2;
+                    if (maze[x, y] == 3)
+                    {
+                        maze[x, y] = 2;
+                    }
                 }
             }
         }
-    }
-    private void EndGame()
-    {
-        gameEnded = true;
+        public void EndGame()
+        {
+            gameEnded = true;
+        }
     }
 }

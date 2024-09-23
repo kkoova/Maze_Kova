@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using KorobeynikovaMaze;
 
 public class MazeGenerator
 {
     static int width;
     static int height;
     static int[,] maze = new int[0, 0];
+    static int playerX = 1, playerY = 1;
 
     public static void Main()
     {
-        var playerSymbol = 'P';
-        int playerX = 1, playerY = 1;
-
         while (width < 4 || height < 4)
         {
             Console.Write("Введите ширину: ");
@@ -40,75 +39,24 @@ public class MazeGenerator
         { height += 1; }
 
         maze = new int[width, height];
-
-        Console.Clear();
         GenerateMaze();
         var handler = new KeyboardHandler(maze);
 
         while (!handler.IsGameEnded)
         {
+            Console.Clear();
             PrintMaze();
             ConsoleKeyInfo info = Console.ReadKey(true);
-            handler.HandleKeyPress(info.Key);
-            DisplayMaze(width, height, playerX, playerY);
-            MovePlayer(info.Key, ref playerX, ref playerY, width, height);
-        }
-    }
-
-    static void DisplayMaze(int width, int height, int playerX, int playerY)
-    {
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
+            handler.HandleKeyPress(info.Key, ref playerX, ref playerY);
+            if (maze[playerX, playerY] == 3)
             {
-                if (x == playerX && y == playerY)
-                {
-                    Console.Write('P');
-                }
-                else
-                {
-                    Console.Write(' ');
-                }
+                Console.WriteLine("Вы прошли лабиринт, Ура!");
+                Console.ReadLine();
+                handler.EndGame();
             }
-            Console.WriteLine();
+
         }
     }
-
-    static void MovePlayer(ConsoleKey key, ref int playerX, ref int playerY, int width, int height)
-    {
-        switch (key)
-        {
-            case ConsoleKey.UpArrow:
-                if (playerY > 0)
-                {
-                    playerY--;
-                }
-
-                break;
-            case ConsoleKey.DownArrow:
-                if (playerY < height - 1)
-                {
-                    playerY++;
-                }
-
-                break;
-            case ConsoleKey.LeftArrow:
-                if (playerX > 0)
-                {
-                    playerX--;
-                }
-
-                break;
-            case ConsoleKey.RightArrow:
-                if (playerX < width - 1)
-                {
-                    playerX++;
-                }
-
-                break;
-        }
-    }
-
     static void GenerateMaze()
     {
         for (var y = 0; y < height; y++)
@@ -165,7 +113,11 @@ public class MazeGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                if (maze[x, y] == 1)
+                if (x == playerX && y == playerY)
+                {
+                    Console.Write('P');
+                }
+                else if (maze[x, y] == 1)
                 {
                     Console.Write("█");
                 }
