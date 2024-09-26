@@ -10,7 +10,7 @@ public class MazeGenerator
     static int height;
     static int[,] maze = new int[0, 0];
     static int playerX = 1, playerY = 1;
-    static List<(int x, int y)> path = new List<(int x, int y)>();
+    static int visibilityRadius = 3;
 
     public static void Main()
     {
@@ -34,30 +34,35 @@ public class MazeGenerator
             }
         }
 
+        Console.Clear();
+
         if (width % 2 == 0)
         { width += 1; }
         if (height % 2 == 0)
         { height += 1; }
-
+        Console.WriteLine("_____________________________" +
+            "\nДля выхода - 'X'" +
+            "\nДля подсказки - 'E'" +
+            "\nУправление:\n\n   W" +
+            "\nA  S  D" +
+            "\n_____________________________");
+        Console.WriteLine("Для продолжение, нажмите на любую клавишу");
+        Console.ReadLine();
+        Console.Clear();
         maze = new int[width, height];
         GenerateMaze();
-        IsExitFound();
         var handler = new KeyboardHandler(maze);
 
         while (!handler.IsGameEnded)
         {
-            Console.Clear();
             PrintMaze();
             ConsoleKeyInfo info = Console.ReadKey(true);
             handler.HandleKeyPress(info.Key, ref playerX, ref playerY);
             if (maze[playerX, playerY] == 3)
             {
+                Console.WriteLine("Вы прошли лабиринт, Ура!");
                 Console.ReadLine();
                 handler.EndGame();
-            }
-            if (info.Key == ConsoleKey.E && IsExitFound())
-            {
-                ShowPath();
             }
         }
     }
@@ -115,82 +120,86 @@ public class MazeGenerator
 
         for (int y = 0; y < height; y++)
         {
+            Console.SetCursorPosition(0, y);
             for (int x = 0; x < width; x++)
             {
-                if (x == playerX && y == playerY)
+                if (Math.Abs(x - playerX) <= visibilityRadius && Math.Abs(y - playerY) <= visibilityRadius)
                 {
-                    Console.Write('P');
+                    if (x == playerX && y == playerY)
+                    {
+                        Console.Write('P');
+                    }
+                    else if (maze[x, y] == 1)
+                    {
+                        Console.Write("█");
+                    }
+                    else if (maze[x, y] == 0)
+                    {
+                        Console.Write(" ");
+                    }
+                    else if (maze[x, y] == 2)
+                    {
+                        Console.Write("<");
+                    }
+                    else if (maze[x, y] == 3)
+                    {
+                        Console.Write(">");
+                    }
+                    else if (maze[x, y] == 4)
+                    {
+                        Console.Write(".");
+                    }
                 }
-                else if (maze[x, y] == 1)
+                else
                 {
-                    Console.Write("█");
+                    Console.Write("▒");
                 }
-                else if (maze[x, y] == 0)
-                {
-                    Console.Write(" ");
-                }
-                else if (maze[x, y] == 2)
-                {
-                    Console.Write("<");
-                }
-                else if (maze[x, y] == 3)
-                {
-                    Console.Write(">");
-                }
-                else if(maze[x, y] == 4)
-                {
-                    Console.Write("~");
-                }
-
             }
             Console.WriteLine();
         }
-        Console.WriteLine("\nДля выхода - 'X'\nДля подсказки - 'E'\nУправление:\n\n   W\nA  S  D");
     }
-    static bool IsExitFound()
+    static public List<(int x, int y)> FindShortestPath()
     {
+        var start = (x: 1, y: 1);
+        var end = (x: width - 2, y: height - 2);
         var queue = new Queue<(int x, int y)>();
         var visited = new HashSet<(int x, int y)>();
+        var parent = new Dictionary<(int x, int y), (int x, int y)>();
 
-        queue.Enqueue((playerX, playerY));
-        visited.Add((playerX, playerY));
+        queue.Enqueue(start);
+        visited.Add(start);
+
+        (int x, int y)[] directions = { (0, -1), (0, 1), (-1, 0), (1, 0) };
 
         while (queue.Count > 0)
         {
-            var (currentX, currentY) = queue.Dequeue();
+            var current = queue.Dequeue();
 
-            if (maze[currentX, currentY] == 3)
+            if (current == end)
             {
-                path.Clear(); // Очистка пути при новом поиске
-                path.Add((currentX, currentY));
-                return true;
+                var path = new List<(int x, int y)>();
+                while (current != start)
+                {
+                    path.Add(current);
+                    current = parent[current];
+                }
+                path.Add(start);
+                path.Reverse();
+                return path;
             }
 
-            foreach (var (dx, dy) in new[] { (-1, 0), (1, 0), (0, -1), (0, 1) })
+            foreach (var (dx, dy) in directions)
             {
-                var newX = currentX + dx;
-                var newY = currentY + dy;
-
-                if (newX >= 0 && newX < width && newY >= 0 && newY < height &&
-                    maze[newX, newY] != 1 && !visited.Contains((newX, newY)))
+                var neighbor = (x: current.x + dx, y: current.y + dy);
+                if (neighbor.x >= 0 && neighbor.x < width && neighbor.y >= 0 && neighbor.y < height &&
+                    maze[neighbor.x, neighbor.y] != 1 && !visited.Contains(neighbor))
                 {
-                    queue.Enqueue((newX, newY));
-                    visited.Add((newX, newY));
-                    path.Add((newX, newY));
+                    visited.Add(neighbor);
+                    parent[neighbor] = current;
+                    queue.Enqueue(neighbor);
                 }
             }
         }
-
-        return false;
-    }
-
-
-    static public void ShowPath()
-    {
-        foreach (var (x, y) in path)
-        {
-            maze[x, y] = 4;
-        }
-        PrintMaze();
+        return new List<(int x, int y)>();
     }
 }

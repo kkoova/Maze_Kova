@@ -2,17 +2,14 @@
 
 namespace KorobeynikovaMaze
 {
-    public class KeyboardHandler
+    public class KeyboardHandler(int[,] maze)
     {
-        private readonly int[,] maze;
+        private readonly int[,] maze = maze;
         private bool gameEnded = false;
         private bool isModifiedPath = false;
+
         public bool IsGameEnded => gameEnded;
 
-        public KeyboardHandler(int[,] maze)
-        {
-            this.maze = maze;
-        }
         public void HandleKeyPress(ConsoleKey key, ref int playerX, ref int playerY)
         {
             if (gameEnded)
@@ -22,6 +19,9 @@ namespace KorobeynikovaMaze
 
             switch (key)
             {
+                case ConsoleKey.E:
+                    ToggleModifiedPath();
+                    break;
                 case ConsoleKey.X:
                     EndGame();
                     break;
@@ -43,36 +43,34 @@ namespace KorobeynikovaMaze
                     break;
             }
         }
-
         private void ToggleModifiedPath()
         {
-            if (!isModifiedPath)
+            if (isModifiedPath)
             {
-                ApplyModifiedPath();
+                ResetToOriginalPath();
             }
             else
             {
-                ResetToOriginalPath();
+                ApplyModifiedPath();
             }
             isModifiedPath = !isModifiedPath;
         }
 
         private void ApplyModifiedPath()
         {
-            MazeGenerator.ShowPath();
+            var path = MazeGenerator.FindShortestPath();
+            foreach (var (px, py) in path)
+            {
+                maze[px, py] = 4;
+            }
         }
 
         private void ResetToOriginalPath()
         {
-            for (var x = 0; x < maze.GetLength(0); x++)
+            var path = MazeGenerator.FindShortestPath();
+            foreach (var (px, py) in path)
             {
-                for (var y = 0; y < maze.GetLength(1); y++)
-                {
-                    if (maze[x, y] == 3)
-                    {
-                        maze[x, y] = 2;
-                    }
-                }
+                maze[px, py] = 0;
             }
         }
         public void EndGame()
