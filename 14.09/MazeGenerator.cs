@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using KorobeynikovaMaze;
 
 public class MazeGenerator
@@ -24,6 +23,7 @@ public class MazeGenerator
                 Console.WriteLine("Ошибка: введите корректное число больше 4.");
                 continue;
             }
+
             Console.Write("Введите высоту: ");
             var heightInput = Console.ReadLine();
 
@@ -40,24 +40,28 @@ public class MazeGenerator
         { width += 1; }
         if (height % 2 == 0)
         { height += 1; }
+
         Console.WriteLine("_____________________________" +
             "\nДля выхода - 'X'" +
             "\nДля подсказки - 'E'" +
             "\nУправление:\n\n   W" +
             "\nA  S  D" +
             "\n_____________________________");
-        Console.WriteLine("Для продолжение, нажмите на любую клавишу");
+        Console.WriteLine("Для продолжения, нажмите на любую клавишу");
         Console.ReadLine();
         Console.Clear();
+
         maze = new int[width, height];
         GenerateMaze();
+
         var handler = new KeyboardHandler(maze);
 
         while (!handler.IsGameEnded)
         {
             PrintMaze();
-            ConsoleKeyInfo info = Console.ReadKey(true);
+            ConsoleKeyInfo info = Console.ReadKey(true)
             handler.HandleKeyPress(info.Key, ref playerX, ref playerY);
+
             if (maze[playerX, playerY] == 3)
             {
                 Console.WriteLine("Вы прошли лабиринт, Ура!");
@@ -66,6 +70,8 @@ public class MazeGenerator
             }
         }
     }
+
+    // Генерация лабиринта алгоритмом рекурсивного поиска
     static void GenerateMaze()
     {
         for (var y = 0; y < height; y++)
@@ -93,6 +99,7 @@ public class MazeGenerator
             {
                 var nx = currentX + dx;
                 var ny = currentY + dy;
+
                 if (nx > 0 && nx < width - 1 && ny > 0 && ny < height - 1 && maze[nx, ny] == 1)
                 {
                     neighbors.Add((nx, ny));
@@ -113,6 +120,7 @@ public class MazeGenerator
         }
     }
 
+    // Отображение лабиринта с учётом радиуса видимости
     static void PrintMaze()
     {
         maze[1, 1] = 2;
@@ -158,6 +166,8 @@ public class MazeGenerator
             Console.WriteLine();
         }
     }
+
+    // Поиск кратчайшего пути с использованием BFS (поиск в ширину)
     static public List<(int x, int y)> FindShortestPath()
     {
         var start = (x: 1, y: 1);
