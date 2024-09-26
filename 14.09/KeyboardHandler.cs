@@ -1,127 +1,85 @@
 ﻿using System;
-using System.Numerics;
-using System.Collections.Generic;
 
 namespace KorobeynikovaMaze
 {
+    /// <summary>
+    /// Обработка нажатий клавиш
+    /// </summary>
     public class KeyboardHandler
     {
-        private readonly int[,] maze;
-        private bool gameEnded = false;
-        private bool isModifiedPath = false;
+        private int[,] maze;
+        public bool IsGameEnded { get; private set; }
+        private bool isModifiedPath = true;
 
-        public bool IsGameEnded => gameEnded;
-
+        /// <summary>
+        /// Приравнивание массива лабиринта
+        /// </summary>
+        /// <param name="maze">Главный массив лабиринта</param>
         public KeyboardHandler(int[,] maze)
         {
             this.maze = maze;
         }
 
-        // Обработка нажатий клавиш
+        /// <summary>
+        /// Обработка нажатий клавиш
+        /// </summary>
+        /// <param name="key">Нажатая клавиша</param>
+        /// <param name="playerX">Позиция x игрока</param>
+        /// <param name="playerY"Позиция y игрока></param>
         public void HandleKeyPress(ConsoleKey key, ref int playerX, ref int playerY)
         {
-            if (gameEnded)
-            {
-                return;
-            }
+            int newX = playerX, newY = playerY;
 
             switch (key)
             {
-                case ConsoleKey.E:
-                    ToggleModifiedPath();  // Включение/выключение отображения кратчайшего пути
-                    break;
-                case ConsoleKey.X:
-                    EndGame();  // Завершение игры
-                    break;
                 case ConsoleKey.W:
-                    MoveUp(ref playerX, ref playerY);  // Движение вверх
+                    newY -= 1;
                     break;
                 case ConsoleKey.S:
-                    MoveDown(ref playerX, ref playerY);  // Движение вниз
+                    newY += 1;
                     break;
                 case ConsoleKey.A:
-                    MoveLeft(ref playerX, ref playerY);  // Движение влево
+                    newX -= 1;
                     break;
                 case ConsoleKey.D:
-                    MoveRight(ref playerX, ref playerY);  // Движение вправо
+                    newX += 1;
+                    break;
+                case ConsoleKey.X:
+                    EndGame();
+                    return;
+                case ConsoleKey.E:
+                    var path = MazeSolver.FindShortestPath(maze, maze.GetLength(0), maze.GetLength(1));
+                    if (isModifiedPath)
+                    {
+                        foreach (var (x, y) in path)
+                        {
+                            maze[x, y] = 4;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var (x, y) in path)
+                        {
+                            maze[x, y] = 0;
+                        }
+                    }
+                    isModifiedPath = !isModifiedPath;
                     break;
             }
-        }
 
-        // Включение или выключение кратчайшего пути
-        private void ToggleModifiedPath()
-        {
-            if (isModifiedPath)
+            if (maze[newX, newY] != 1)
             {
-                ResetToOriginalPath();
-            }
-            else
-            {
-                ApplyModifiedPath();
-            }
-            isModifiedPath = !isModifiedPath;
-        }
-
-        // Применение кратчайшего пути (помечаем его в лабиринте)
-        private void ApplyModifiedPath()
-        {
-            var path = MazeGenerator.FindShortestPath();
-            foreach (var (px, py) in path)
-            {
-                maze[px, py] = 4; // Обозначаем путь символом "."
+                playerX = newX;
+                playerY = newY;
             }
         }
 
-        // Возвращение к исходному виду лабиринта (снятие отметок пути)
-        private void ResetToOriginalPath()
-        {
-            var path = MazeGenerator.FindShortestPath();
-            foreach (var (px, py) in path)
-            {
-                maze[px, py] = 0;  // Сбрасываем путь обратно на пустое место
-            }
-        }
-
-        // Завершение игры
+        /// <summary>
+        /// Завершение игры
+        /// </summary>
         public void EndGame()
         {
-            gameEnded = true;
-        }
-
-        // Движение вверх
-        private void MoveUp(ref int playerX, ref int playerY)
-        {
-            if (playerY > 0 && maze[playerX, playerY - 1] != 1)
-            {
-                playerY--;
-            }
-        }
-
-        // Движение вниз
-        private void MoveDown(ref int playerX, ref int playerY)
-        {
-            if (playerY < maze.GetLength(1) - 1 && maze[playerX, playerY + 1] != 1)
-            {
-                playerY++;
-            }
-        }
-
-        // Движение влево
-        private void MoveLeft(ref int playerX, ref int playerY)
-        {
-            if (playerX > 0 && maze[playerX - 1, playerY] != 1)
-            {
-                playerX--;
-            }
-        }
-
-        // Движение вправо
-        private void MoveRight(ref int playerX, ref int playerY)
-        {
-            if (playerX < maze.GetLength(0) - 1 && maze[playerX + 1, playerY] != 1)
-            {
-                playerX++;
-            }
+            IsGameEnded = true;
         }
     }
 }
