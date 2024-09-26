@@ -10,6 +10,7 @@ public class MazeGenerator
     static int height;
     static int[,] maze = new int[0, 0];
     static int playerX = 1, playerY = 1;
+    static List<(int x, int y)> path = new List<(int x, int y)>();
 
     public static void Main()
     {
@@ -40,6 +41,7 @@ public class MazeGenerator
 
         maze = new int[width, height];
         GenerateMaze();
+        IsExitFound();
         var handler = new KeyboardHandler(maze);
 
         while (!handler.IsGameEnded)
@@ -50,11 +52,13 @@ public class MazeGenerator
             handler.HandleKeyPress(info.Key, ref playerX, ref playerY);
             if (maze[playerX, playerY] == 3)
             {
-                Console.WriteLine("Вы прошли лабиринт, Ура!");
                 Console.ReadLine();
                 handler.EndGame();
             }
-
+            if (info.Key == ConsoleKey.E && IsExitFound())
+            {
+                ShowPath();
+            }
         }
     }
     static void GenerateMaze()
@@ -129,13 +133,64 @@ public class MazeGenerator
                 {
                     Console.Write("<");
                 }
-                else
+                else if (maze[x, y] == 3)
                 {
                     Console.Write(">");
                 }
+                else if(maze[x, y] == 4)
+                {
+                    Console.Write("~");
+                }
+
             }
             Console.WriteLine();
         }
         Console.WriteLine("\nДля выхода - 'X'\nДля подсказки - 'E'\nУправление:\n\n   W\nA  S  D");
+    }
+    static bool IsExitFound()
+    {
+        var queue = new Queue<(int x, int y)>();
+        var visited = new HashSet<(int x, int y)>();
+
+        queue.Enqueue((playerX, playerY));
+        visited.Add((playerX, playerY));
+
+        while (queue.Count > 0)
+        {
+            var (currentX, currentY) = queue.Dequeue();
+
+            if (maze[currentX, currentY] == 3)
+            {
+                path.Clear(); // Очистка пути при новом поиске
+                path.Add((currentX, currentY));
+                return true;
+            }
+
+            foreach (var (dx, dy) in new[] { (-1, 0), (1, 0), (0, -1), (0, 1) })
+            {
+                var newX = currentX + dx;
+                var newY = currentY + dy;
+
+                if (newX >= 0 && newX < width && newY >= 0 && newY < height &&
+                    maze[newX, newY] != 1 && !visited.Contains((newX, newY)))
+                {
+                    queue.Enqueue((newX, newY));
+                    visited.Add((newX, newY));
+                    path.Add((newX, newY));
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    static public void ShowPath()
+    {
+        foreach (var (x, y) in path)
+        {
+            maze[x, y] = 4;
+        }
+        PrintMaze();
     }
 }

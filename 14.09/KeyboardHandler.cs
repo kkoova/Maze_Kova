@@ -2,14 +2,17 @@
 
 namespace KorobeynikovaMaze
 {
-    public class KeyboardHandler(int[,] maze)
+    public class KeyboardHandler
     {
-        private readonly int[,] maze = maze;
+        private readonly int[,] maze;
         private bool gameEnded = false;
         private bool isModifiedPath = false;
-
         public bool IsGameEnded => gameEnded;
 
+        public KeyboardHandler(int[,] maze)
+        {
+            this.maze = maze;
+        }
         public void HandleKeyPress(ConsoleKey key, ref int playerX, ref int playerY)
         {
             if (gameEnded)
@@ -19,9 +22,6 @@ namespace KorobeynikovaMaze
 
             switch (key)
             {
-                case ConsoleKey.E:
-                    ToggleModifiedPath();
-                    break;
                 case ConsoleKey.X:
                     EndGame();
                     break;
@@ -43,31 +43,23 @@ namespace KorobeynikovaMaze
                     break;
             }
         }
+
         private void ToggleModifiedPath()
         {
-            if (isModifiedPath)
+            if (!isModifiedPath)
             {
-                ResetToOriginalPath();
+                ApplyModifiedPath();
             }
             else
             {
-                ApplyModifiedPath();
+                ResetToOriginalPath();
             }
             isModifiedPath = !isModifiedPath;
         }
 
         private void ApplyModifiedPath()
         {
-            for (var x = 0; x < maze.GetLength(0); x++)
-            {
-                for (var y = 0; y < maze.GetLength(1); y++)
-                {
-                    if (maze[x, y] == 2)
-                    {
-                        maze[x, y] = 3;
-                    }
-                }
-            }
+            MazeGenerator.ShowPath();
         }
 
         private void ResetToOriginalPath()
